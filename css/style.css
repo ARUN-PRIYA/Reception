@@ -303,10 +303,10 @@ svg{display:block;}
 .welcome-photo{position:relative;}
 .welcome-photo::after{
   /* offset gold frame sized to the photo only (not the caption) */
-  content:'';position:absolute;top:18px;left:18px;right:-18px;aspect-ratio:1085/1450;z-index:-1;
+  content:'';position:absolute;top:18px;left:18px;right:-18px;aspect-ratio:1024/1536;z-index:-1;
   border:1px solid var(--gold-soft);border-radius:4px;
 }
-.frame-img{overflow:hidden;border-radius:4px;aspect-ratio:1085/1450;box-shadow:0 30px 60px -30px rgba(43,42,34,.5);}
+.frame-img{overflow:hidden;border-radius:4px;aspect-ratio:1024/1536;box-shadow:0 30px 60px -30px rgba(43,42,34,.5);}
 .frame-img img{width:100%;height:100%;object-fit:cover;}
 .welcome-photo figcaption{
   margin-top:30px;font-family:var(--font-caps);font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--olive);
