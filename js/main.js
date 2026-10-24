@@ -530,20 +530,65 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
   });
 
-  /* ---------- Share the invitation (native share sheet, else copy the link) ---------- */
+  /* ---------- Share the invitation: QR card image + message + link in one go ---------- */
   var shareUrl = C.shareUrl || location.href.split('#')[0];
-  var shareText = 'You are invited to the ' + C.event.title + ' of ' + C.couple.short + ' — ' +
-    C.event.dateLabel + ', ' + C.event.timeLabel + ', ' + C.venue.name + ', ' + C.venue.city + '.';
+  // The link lives inside the text: apps such as WhatsApp drop `url` when an image is attached
+  var shareText = [
+    '✨ You\'re Invited ✨',
+    '',
+    'With the grace of God and the blessings of our families,',
+    'we joyfully invite you and your family to our',
+    '',
+    '💍 *' + C.event.title + '* 💍',
+    '*' + C.couple.short + '*',
+    '',
+    '📅 ' + C.event.dateLabel,
+    '🕕 ' + C.event.timeLabel,
+    '📍 ' + C.venue.name + ', ' + C.venue.city,
+    '',
+    'Tap to open our invitation 👇',
+    shareUrl,
+    '',
+    'Your presence will make our day complete 🙏'
+  ].join('\n');
   var shareNote = $('#shareNote');
 
+  // Fetch the QR card ahead of time: awaiting it inside the click would expire the
+  // user gesture that navigator.share needs (Safari is strict about this).
+  var qrFile = null;
+  if(window.fetch && window.File){
+    fetch(C.shareImage || 'share/invite-qr.png')
+      .then(function(r){ return r.ok ? r.blob() : Promise.reject(); })
+      .then(function(b){ qrFile = new File([b], 'Arun-Priya-Invitation.png', {type:'image/png'}); })
+      .catch(function(){});
+  }
+
+  function downloadQr(){
+    if(!qrFile) return;
+    var url = URL.createObjectURL(qrFile);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = qrFile.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
   $('#shareBtn').addEventListener('click', function(){
+    var title = C.couple.short + ' — ' + C.event.title;
     if(navigator.share){
-      navigator.share({title: C.couple.short + ' — ' + C.event.title, text: shareText, url: shareUrl}).catch(function(){});
+      var withImage = {title: title, text: shareText, files: qrFile ? [qrFile] : []};
+      var data = qrFile && navigator.canShare && navigator.canShare(withImage) ? withImage : {title: title, text: shareText};
+      navigator.share(data).catch(function(){});
       return;
     }
-    var copied = navigator.clipboard ? navigator.clipboard.writeText(shareText + ' ' + shareUrl) : Promise.reject();
-    copied.then(function(){ shareNote.textContent = 'Invitation link copied — paste it to share.'; })
-      .catch(function(){ shareNote.textContent = shareUrl; });
+    // Desktop: copy the message (link included) and save the QR card for attaching
+    var copied = navigator.clipboard ? navigator.clipboard.writeText(shareText) : Promise.reject();
+    copied.then(function(){
+      downloadQr();
+      shareNote.textContent = qrFile ? 'Message copied & QR card saved — paste the message and attach the card.' : 'Invitation message copied — paste it to share.';
+    }).catch(function(){ shareNote.textContent = shareUrl; });
   });
 
   /* ---------- Background music (only when config.music names a file) ---------- */
