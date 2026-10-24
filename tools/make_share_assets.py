@@ -66,7 +66,7 @@ def preview_card():
     w, h = 1200, 630
     pw = 400
     card = Image.new("RGB", (w, h), FOREST)
-    photo = Image.open(os.path.join(IMAGES, "hero.webp")).convert("RGB")
+    photo = Image.open(os.path.join(IMAGES, "evening.webp")).convert("RGB")
     card.paste(cover(photo, (pw, h)), (w - pw, 0))
 
     # soft fade from the text panel into the photo
@@ -115,34 +115,39 @@ def qr_image(scale, dark, light):
 def qr_card():
     """Portrait card to forward as an image; scanning opens the invitation."""
     w, h = 1080, 1350
-    photo = Image.open(os.path.join(IMAGES, "rings.webp")).convert("RGB")
-    card = cover(photo, (w, h)).filter(ImageFilter.GaussianBlur(18))
-    card = Image.blend(card, Image.new("RGB", (w, h), FOREST), 0.78)
+    ph = 640
+    card = Image.new("RGB", (w, h), FOREST)
+    photo = Image.open(os.path.join(IMAGES, "evening.webp")).convert("RGB")
+    card.paste(ImageOps.fit(photo, (w, ph), Image.LANCZOS, centering=(0.5, 0.12)), (0, 0))
+
+    # photo fades into the text panel below it
+    fade_h = 240
+    fade = Image.new("L", (w, fade_h))
+    for y in range(fade_h):
+        ImageDraw.Draw(fade).line((0, y, w, y), fill=int(255 * y / (fade_h - 1)))
+    card.paste(Image.new("RGB", (w, fade_h), FOREST), (0, ph - fade_h), fade)
 
     d = ImageDraw.Draw(card)
     d.rectangle((36, 36, w - 37, h - 37), outline=GOLD, width=2)
     d.rectangle((50, 50, w - 51, h - 51), outline=(120, 100, 60), width=1)
 
     cx = w // 2
-    cross(d, cx, 105, 70, GOLD)
-    centered(d, cx, 210, "YOU ARE CORDIALLY INVITED TO", font("Cinzel.ttf", 28), CHAMPAGNE, spacing=3)
-    centered(d, cx, 252, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 28), CHAMPAGNE, spacing=3)
-    centered(d, cx, 300, "Arun & Priya", font("GreatVibes.ttf", 132), GOLD)
-    rule(d, cx, 495, 220, GOLD)
-    centered(d, cx, 525, "WEDNESDAY · 11 NOVEMBER 2026 · 6:00 PM", font("Cinzel.ttf", 27), IVORY, spacing=2)
-    centered(d, cx, 570, "Flora Park Inn, Coimbatore", font("CormorantItalic.ttf", 40), CHAMPAGNE)
+    centered(d, cx, 590, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 26), CHAMPAGNE, spacing=3)
+    centered(d, cx, 620, "Arun & Priya", font("GreatVibes.ttf", 116), GOLD)
+    rule(d, cx, 800, 200, GOLD)
+    centered(d, cx, 822, "WEDNESDAY · 11 NOVEMBER 2026 · 6:00 PM", font("Cinzel.ttf", 27), IVORY, spacing=2)
+    centered(d, cx, 864, "Flora Park Inn, Coimbatore", font("CormorantItalic.ttf", 38), CHAMPAGNE)
 
     # QR on an ivory tile so every phone camera reads it reliably
     # whole-pixel modules (no resampling) keep the code crisp for scanners
     side = segno.make(URL, error="h").symbol_size(border=2)[0]
-    qr = qr_image(440 // side, FOREST, IVORY)
-    tile = 488
-    tx, ty = cx - tile // 2, 665
-    d.rounded_rectangle((tx, ty, tx + tile, ty + tile), radius=22, fill=IVORY, outline=GOLD, width=3)
-    card.paste(qr, (cx - qr.width // 2, ty + (tile - qr.height) // 2))
+    qr = qr_image(7, FOREST, IVORY) if side * 7 <= 300 else qr_image(300 // side, FOREST, IVORY)
+    tile = qr.width + 24
+    tx, ty = cx - tile // 2, 930
+    d.rounded_rectangle((tx, ty, tx + tile, ty + tile), radius=18, fill=IVORY, outline=GOLD, width=3)
+    card.paste(qr, (cx - qr.width // 2, ty + 12))
 
-    centered(d, cx, ty + tile + 34, "SCAN TO OPEN THE INVITATION", font("Cinzel.ttf", 26), GOLD, spacing=3)
-    centered(d, cx, ty + tile + 80, "Photos · Countdown · Map · Add to Calendar", font("CormorantItalic.ttf", 32), CHAMPAGNE)
+    centered(d, cx, ty + tile + 18, "SCAN TO OPEN THE INVITATION", font("Cinzel.ttf", 24), GOLD, spacing=3)
 
     card.save(os.path.join(SHARE, "invite-qr.png"), optimize=True)
     qr_image(16, FOREST, IVORY).save(os.path.join(SHARE, "qr.png"))
