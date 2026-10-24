@@ -530,7 +530,7 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
   });
 
-  /* ---------- Share the invitation: QR card image + message + link in one go ---------- */
+  /* ---------- Share the invitation: message + link (preview card carries the QR) ---------- */
   var shareUrl = C.shareUrl || location.href.split('#')[0];
   // The link lives inside the text so it appears where the message says "Tap to open"
   var shareText = [
