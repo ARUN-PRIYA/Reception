@@ -4,7 +4,7 @@ Run from the project folder (needs Pillow and segno: pip install segno):
     python tools/make_share_assets.py
 
 Writes:
-    images/share-card.jpg  1200x630 link-preview card with QR (WhatsApp / Instagram / Facebook)
+    images/share-qr.jpg  1200x630 link-preview card with QR (WhatsApp / Instagram / Facebook)
     share/invite-qr.png    1080x1350 invitation card with a QR code to the site
     share/qr.png           plain QR code, for printing on cards
     share/message.txt      ready-to-paste message for friends
@@ -64,7 +64,7 @@ def preview_card():
     """Landscape link-preview card: details, QR and photo in one image, so a shared
     link arrives as a single chat message instead of separate image + text."""
     w, h = 1200, 630
-    pw = 420
+    pw = 400
     card = Image.new("RGB", (w, h), FOREST)
     photo = Image.open(os.path.join(IMAGES, "hero.webp")).convert("RGB")
     card.paste(cover(photo, (pw, h)), (w - pw, 0))
@@ -78,24 +78,25 @@ def preview_card():
     d = ImageDraw.Draw(card)
     d.rectangle((14, 14, w - pw - 14, h - 15), outline=GOLD, width=1)
 
-    cx = 270
+    cx = 215
     cross(d, cx, 62, 50, GOLD)
-    centered(d, cx, 135, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
-    centered(d, cx, 172, "Arun & Priya", font("GreatVibes.ttf", 88), GOLD)
-    rule(d, cx, 318, 160, GOLD)
-    centered(d, cx, 348, "WEDNESDAY", font("Cinzel.ttf", 22), IVORY, spacing=3)
-    centered(d, cx, 382, "11 NOVEMBER 2026", font("Cinzel.ttf", 22), IVORY, spacing=3)
-    centered(d, cx, 420, "6:00 PM onwards", font("CormorantItalic.ttf", 32), CHAMPAGNE)
-    centered(d, cx, 470, "FLORA PARK INN", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
-    centered(d, cx, 500, "COIMBATORE", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
+    centered(d, cx, 135, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 16), CHAMPAGNE, spacing=2)
+    centered(d, cx, 170, "Arun & Priya", font("GreatVibes.ttf", 74), GOLD)
+    rule(d, cx, 300, 140, GOLD)
+    centered(d, cx, 330, "WEDNESDAY", font("Cinzel.ttf", 21), IVORY, spacing=3)
+    centered(d, cx, 364, "11 NOVEMBER 2026", font("Cinzel.ttf", 21), IVORY, spacing=3)
+    centered(d, cx, 402, "6:00 PM onwards", font("CormorantItalic.ttf", 30), CHAMPAGNE)
+    centered(d, cx, 452, "FLORA PARK INN", font("Cinzel.ttf", 19), CHAMPAGNE, spacing=3)
+    centered(d, cx, 482, "COIMBATORE", font("Cinzel.ttf", 19), CHAMPAGNE, spacing=3)
 
-    # QR column between the details and the photo
-    qx = 645
+    # QR dead centre: when WhatsApp shrinks the preview to a centre-cropped square,
+    # the QR is what stays visible
+    qx = w // 2
     side = segno.make(URL, error="h").symbol_size(border=2)[0]
-    qr = qr_image(200 // side, FOREST, IVORY)
+    qr = qr_image(260 // side, FOREST, IVORY)
     tile = qr.width + 24
-    ty = (h - tile) // 2 - 20
-    d.line((qx - 140, 120, qx - 140, h - 120), fill=(90, 76, 46), width=1)
+    ty = (h - tile) // 2 - 18
+    d.line((qx - 190, 120, qx - 190, h - 120), fill=(90, 76, 46), width=1)
     d.rounded_rectangle((qx - tile // 2, ty, qx + tile // 2, ty + tile), radius=14, fill=IVORY, outline=GOLD, width=2)
     card.paste(qr, (qx - qr.width // 2, ty + 12))
     centered(d, qx, ty + tile + 22, "SCAN TO OPEN", font("Cinzel.ttf", 18), GOLD, spacing=3)
@@ -172,7 +173,7 @@ def main():
     qr_card()
     with open(os.path.join(SHARE, "message.txt"), "w", encoding="utf-8") as f:
         f.write(MESSAGE.format(url=URL))
-    print("images/share-card.jpg, share/invite-qr.png, share/qr.png, share/message.txt written")
+    print("images/share-qr.jpg, share/invite-qr.png, share/qr.png, share/message.txt written")
 
 
 if __name__ == "__main__":

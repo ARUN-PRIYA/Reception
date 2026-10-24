@@ -530,7 +530,7 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
   });
 
-  /* ---------- Share the invitation: message + link (preview card carries the QR) ---------- */
+  /* ---------- Share the invitation: QR card + message + link ---------- */
   var shareUrl = C.shareUrl || location.href.split('#')[0];
   // The link lives inside the text so it appears where the message says "Tap to open"
   var shareText = [
@@ -553,11 +553,28 @@
   ].join('\n');
   var shareNote = $('#shareNote');
 
-  // Text only, on purpose: attaching an image makes WhatsApp send two separate messages.
-  // The link's preview card (og:image, with the QR) shows up inside the same message instead.
+  // Phones: QR card + message go together, which WhatsApp on a phone sends as one image
+  // with a caption. Desktop share sheets split image and text into two messages, so there
+  // we send text only and the link's preview card (og:image, QR in the centre) rides along.
+  // The card is fetched ahead of time: awaiting it inside the click would expire the
+  // user gesture that navigator.share needs.
+  var qrFile = null;
+  var isPhone = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+  if(isPhone && navigator.canShare && window.File){
+    fetch('share/invite-qr.png')
+      .then(function(r){ return r.ok ? r.blob() : Promise.reject(); })
+      .then(function(b){
+        var f = new File([b], 'Arun-Priya-Invitation.png', {type:'image/png'});
+        if(navigator.canShare({files:[f]})) qrFile = f;
+      })
+      .catch(function(){});
+  }
+
   $('#shareBtn').addEventListener('click', function(){
     if(navigator.share){
-      navigator.share({title: C.couple.short + ' — ' + C.event.title, text: shareText}).catch(function(){});
+      var data = {title: C.couple.short + ' — ' + C.event.title, text: shareText};
+      if(qrFile) data.files = [qrFile];
+      navigator.share(data).catch(function(){});
       return;
     }
     var copied = navigator.clipboard ? navigator.clipboard.writeText(shareText) : Promise.reject();
