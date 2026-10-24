@@ -154,7 +154,7 @@ With the grace of God and the blessings of our families,
 we joyfully invite you and your family to our
 
 \U0001F48D *Wedding Reception* \U0001F48D
-*Arun & Priya*
+*Arun Daniel & Priyadharshini*
 
 \U0001F4C5 Wednesday, 11 November 2026
 \0001F555 6:00 PM onwards

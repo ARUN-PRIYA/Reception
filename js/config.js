@@ -6,7 +6,9 @@ window.INVITATION = {
   couple: {
     short: 'Arun & Priya',
     groom: 'S. Arun Kumar',
-    bride: 'A. Priyadharshini'
+    bride: 'A. Priyadharshini',
+    // Names used in the shared WhatsApp message
+    shareNames: 'Arun Daniel & Priyadharshini'
   },
 
   event: {

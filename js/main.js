@@ -540,7 +540,7 @@
     'we joyfully invite you and your family to our',
     '',
     '💍 *' + C.event.title + '* 💍',
-    '*' + C.couple.short + '*',
+    '*' + (C.couple.shareNames || C.couple.short) + '*',
     '',
     '📅 ' + C.event.dateLabel,
     '🕕 ' + C.event.timeLabel,
