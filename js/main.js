@@ -530,6 +530,22 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
   });
 
+  /* ---------- Share the invitation (native share sheet, else copy the link) ---------- */
+  var shareUrl = C.shareUrl || location.href.split('#')[0];
+  var shareText = 'You are invited to the ' + C.event.title + ' of ' + C.couple.short + ' — ' +
+    C.event.dateLabel + ', ' + C.event.timeLabel + ', ' + C.venue.name + ', ' + C.venue.city + '.';
+  var shareNote = $('#shareNote');
+
+  $('#shareBtn').addEventListener('click', function(){
+    if(navigator.share){
+      navigator.share({title: C.couple.short + ' — ' + C.event.title, text: shareText, url: shareUrl}).catch(function(){});
+      return;
+    }
+    var copied = navigator.clipboard ? navigator.clipboard.writeText(shareText + ' ' + shareUrl) : Promise.reject();
+    copied.then(function(){ shareNote.textContent = 'Invitation link copied — paste it to share.'; })
+      .catch(function(){ shareNote.textContent = shareUrl; });
+  });
+
   /* ---------- Background music (only when config.music names a file) ---------- */
   var musicBtn = $('#musicBtn');
   var audio = $('#bgMusic');

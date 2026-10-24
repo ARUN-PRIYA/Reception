@@ -18,6 +18,9 @@ window.INVITATION = {
     timeLabel: '6:00 PM onwards'
   },
 
+  // Public address of the published site, used by the Share button
+  shareUrl: 'https://arun-priya.github.io/Reception/',
+
   venue: {
     name: 'Flora Park Inn',
     city: 'Coimbatore',
