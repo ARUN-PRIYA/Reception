@@ -12,7 +12,7 @@ Writes:
 import io
 import os
 import segno
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 URL = "https://arun-priya.github.io/Reception/"
 
