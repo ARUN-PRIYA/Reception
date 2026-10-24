@@ -151,6 +151,8 @@ svg{display:block;}
   padding-top:6%;
 }
 .intro-mono i, .nav-mono i, .footer-mono i, .closing-names i{font-family:var(--font-script);font-style:normal;color:var(--gold);letter-spacing:0;font-size:1.15em;}
+/* matches the letter-spacing that trails the "A", so the & sits centred */
+.intro-mono i, .nav-mono i, .footer-mono i{margin-right:.22em;}
 .intro-eyebrow{font-family:var(--font-caps);font-size:.7rem;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
 .intro-names{
   font-family:var(--font-script);font-size:clamp(3.4rem, 13vw, 6.4rem);line-height:1.15;color:var(--ivory);
