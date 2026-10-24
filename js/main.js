@@ -237,19 +237,23 @@
   }
 
   /* ---------- Scroll storytelling ---------- */
+  // Skip anything inside a [hidden] section: ScrollTrigger cannot measure display:none
+  // elements and throws during setup, which stops every later reveal from running.
+  function shown(list){ return list.filter(function(el){ return !el.closest('[hidden]'); }); }
+
   if(!animate) $$('[data-img-reveal]').forEach(function(el){ el.classList.add('revealed'); });
   if(animate){
-    gsap.utils.toArray('[data-reveal]').forEach(function(el){
+    shown($$('[data-reveal]')).forEach(function(el){
       gsap.from(el, {opacity:0, y:36, duration:1.1, ease:'power3.out',
         scrollTrigger:{trigger:el, start:'top 88%', once:true}});
     });
 
-    gsap.utils.toArray('[data-reveal-stagger]').forEach(function(el){
+    shown($$('[data-reveal-stagger]')).forEach(function(el){
       gsap.from(el.children, {opacity:0, y:40, duration:1, ease:'power3.out', stagger:.14,
         scrollTrigger:{trigger:el, start:'top 85%', once:true}});
     });
 
-    gsap.utils.toArray('[data-img-reveal]').forEach(function(el){
+    shown($$('[data-img-reveal]')).forEach(function(el){
       var media = $('.frame-img, .g-open', el) || el;
       var img = $('img', media);
       var caption = $('figcaption', el);
@@ -265,7 +269,7 @@
     });
 
     // Fine gold strokes draw themselves as they arrive
-    $$('svg').filter(function(svg){
+    shown($$('svg')).filter(function(svg){
       return $('.draw', svg) && !svg.closest('.hero, .intro');
     }).forEach(function(svg){
       var paths = prepDraw($$('.draw', svg));
@@ -274,7 +278,7 @@
     });
 
     // Botanical sprigs: stem first, then leaves unfurl, then berries
-    $$('.sprig').filter(function(s){ return !s.closest('.hero'); }).forEach(function(s){
+    shown($$('.sprig')).filter(function(s){ return !s.closest('.hero'); }).forEach(function(s){
       var stem = prepDraw($$('.stem', s));
       var leaves = prepDraw($$('.lf', s));
       var berries = $$('.berry', s);
@@ -285,7 +289,7 @@
     });
 
     // Hairline seams between sections
-    $$('.section').forEach(function(sec){
+    shown($$('.section')).forEach(function(sec){
       gsap.fromTo(sec, {'--seam':0}, {'--seam':1, ease:'none',
         scrollTrigger:{trigger:sec, start:'top 95%', end:'top 45%', scrub:true}});
     });
@@ -304,7 +308,7 @@
 
     // Parallax depth — desktop only; phones keep a calm, static layout
     gsap.matchMedia().add('(min-width: 861px)', function(){
-      $$('[data-parallax]').forEach(function(el){
+      shown($$('[data-parallax]')).forEach(function(el){
         var speed = parseFloat(el.getAttribute('data-parallax'));
         var section = el.closest('section');
         gsap.to(el, {yPercent:-speed * 100, ease:'none',
