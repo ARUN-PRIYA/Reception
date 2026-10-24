@@ -66,7 +66,7 @@ def preview_card():
     w, h = 1200, 630
     pw = 400
     card = Image.new("RGB", (w, h), FOREST)
-    photo = Image.open(os.path.join(IMAGES, "evening.webp")).convert("RGB")
+    photo = Image.open(os.path.join(IMAGES, "blush.webp")).convert("RGB")
     card.paste(cover(photo, (pw, h)), (w - pw, 0))
 
     # soft fade from the text panel into the photo
@@ -117,8 +117,8 @@ def qr_card():
     w, h = 1080, 1350
     ph = 640
     card = Image.new("RGB", (w, h), FOREST)
-    photo = Image.open(os.path.join(IMAGES, "evening.webp")).convert("RGB")
-    card.paste(ImageOps.fit(photo, (w, ph), Image.LANCZOS, centering=(0.5, 0.12)), (0, 0))
+    photo = Image.open(os.path.join(IMAGES, "blush.webp")).convert("RGB")
+    card.paste(ImageOps.fit(photo, (w, ph), Image.LANCZOS, centering=(0.5, 0.0)), (0, 0))
 
     # photo fades into the text panel below it
     fade_h = 240
