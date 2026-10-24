@@ -174,11 +174,16 @@ svg{display:block;}
   padding:22px var(--gutter);
   transition:background .5s var(--ease), padding .5s var(--ease), box-shadow .5s var(--ease);
 }
-.nav.scrolled{
-  padding-top:12px;padding-bottom:12px;
+.nav.scrolled{padding-top:12px;padding-bottom:12px;}
+/* Blur lives on a pseudo-element: backdrop-filter on .nav itself would trap the
+   fixed mobile menu inside the bar instead of covering the viewport. */
+.nav::before{
+  content:'';position:absolute;inset:0;z-index:-1;
+  opacity:0;transition:opacity .5s var(--ease);
   background:rgba(11,23,19,.93);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   box-shadow:0 1px 0 var(--gold-faint);
 }
+.nav.scrolled::before{opacity:1;}
 .nav-mono{font-family:var(--font-caps);font-size:1.15rem;letter-spacing:.14em;color:var(--champagne);display:flex;align-items:center;gap:.12em;min-height:44px;}
 .nav-links{display:flex;gap:clamp(18px, 2.4vw, 36px);}
 .nav-links a{
@@ -204,7 +209,7 @@ svg{display:block;}
   .nav-links{
     position:fixed;inset:0;z-index:1;
     flex-direction:column;align-items:center;justify-content:center;gap:26px;
-    background:rgba(11,23,19,.97);
+    background:var(--forest);
     opacity:0;visibility:hidden;transition:opacity .45s var(--ease), visibility .45s;
   }
   .nav-links.open{opacity:1;visibility:visible;}
