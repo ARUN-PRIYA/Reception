@@ -4,7 +4,7 @@ Run from the project folder (needs Pillow and segno: pip install segno):
     python tools/make_share_assets.py
 
 Writes:
-    images/share.jpg       1200x630 link-preview card (WhatsApp / Instagram / Facebook)
+    images/share-card.jpg  1200x630 link-preview card with QR (WhatsApp / Instagram / Facebook)
     share/invite-qr.png    1080x1350 invitation card with a QR code to the site
     share/qr.png           plain QR code, for printing on cards
     share/message.txt      ready-to-paste message for friends
@@ -61,30 +61,46 @@ def cover(img, size):
 
 
 def preview_card():
-    """Landscape card shown inside chat apps instead of a bare link."""
+    """Landscape link-preview card: details, QR and photo in one image, so a shared
+    link arrives as a single chat message instead of separate image + text."""
     w, h = 1200, 630
+    pw = 420
     card = Image.new("RGB", (w, h), FOREST)
     photo = Image.open(os.path.join(IMAGES, "hero.webp")).convert("RGB")
-    card.paste(cover(photo, (520, h)), (w - 520, 0))
+    card.paste(cover(photo, (pw, h)), (w - pw, 0))
 
     # soft fade from the text panel into the photo
-    fade = Image.new("L", (160, h))
-    for x in range(160):
-        ImageDraw.Draw(fade).line((x, 0, x, h), fill=int(255 * (1 - x / 159)))
-    card.paste(Image.new("RGB", (160, h), FOREST), (w - 520, 0), fade)
+    fade = Image.new("L", (140, h))
+    for x in range(140):
+        ImageDraw.Draw(fade).line((x, 0, x, h), fill=int(255 * (1 - x / 139)))
+    card.paste(Image.new("RGB", (140, h), FOREST), (w - pw, 0), fade)
 
     d = ImageDraw.Draw(card)
-    cx = 360
-    cross(d, cx, 70, 54, GOLD)
-    centered(d, cx, 150, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 22), CHAMPAGNE, spacing=3)
-    centered(d, cx, 195, "Arun & Priya", font("GreatVibes.ttf", 104), GOLD)
-    rule(d, cx, 350, 170, GOLD)
-    centered(d, cx, 385, "WEDNESDAY · 11 NOVEMBER 2026", font("Cinzel.ttf", 24), IVORY, spacing=2)
-    centered(d, cx, 425, "6:00 PM onwards", font("CormorantItalic.ttf", 34), CHAMPAGNE)
-    centered(d, cx, 475, "FLORA PARK INN · COIMBATORE", font("Cinzel.ttf", 22), CHAMPAGNE, spacing=2)
-    d.rectangle((14, 14, w - 535, h - 15), outline=GOLD + (0,), width=1)
+    d.rectangle((14, 14, w - pw - 14, h - 15), outline=GOLD, width=1)
 
-    card.save(os.path.join(IMAGES, "share.jpg"), "JPEG", quality=84, optimize=True, progressive=True)
+    cx = 270
+    cross(d, cx, 62, 50, GOLD)
+    centered(d, cx, 135, "THE WEDDING RECEPTION OF", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
+    centered(d, cx, 172, "Arun & Priya", font("GreatVibes.ttf", 88), GOLD)
+    rule(d, cx, 318, 160, GOLD)
+    centered(d, cx, 348, "WEDNESDAY", font("Cinzel.ttf", 22), IVORY, spacing=3)
+    centered(d, cx, 382, "11 NOVEMBER 2026", font("Cinzel.ttf", 22), IVORY, spacing=3)
+    centered(d, cx, 420, "6:00 PM onwards", font("CormorantItalic.ttf", 32), CHAMPAGNE)
+    centered(d, cx, 470, "FLORA PARK INN", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
+    centered(d, cx, 500, "COIMBATORE", font("Cinzel.ttf", 20), CHAMPAGNE, spacing=3)
+
+    # QR column between the details and the photo
+    qx = 645
+    side = segno.make(URL, error="h").symbol_size(border=2)[0]
+    qr = qr_image(200 // side, FOREST, IVORY)
+    tile = qr.width + 24
+    ty = (h - tile) // 2 - 20
+    d.line((qx - 140, 120, qx - 140, h - 120), fill=(90, 76, 46), width=1)
+    d.rounded_rectangle((qx - tile // 2, ty, qx + tile // 2, ty + tile), radius=14, fill=IVORY, outline=GOLD, width=2)
+    card.paste(qr, (qx - qr.width // 2, ty + 12))
+    centered(d, qx, ty + tile + 22, "SCAN TO OPEN", font("Cinzel.ttf", 18), GOLD, spacing=3)
+
+    card.save(os.path.join(IMAGES, "share-card.jpg"), "JPEG", quality=86, optimize=True, progressive=True)
 
 
 def qr_image(scale, dark, light):
@@ -156,7 +172,7 @@ def main():
     qr_card()
     with open(os.path.join(SHARE, "message.txt"), "w", encoding="utf-8") as f:
         f.write(MESSAGE.format(url=URL))
-    print("images/share.jpg, share/invite-qr.png, share/qr.png, share/message.txt written")
+    print("images/share-card.jpg, share/invite-qr.png, share/qr.png, share/message.txt written")
 
 
 if __name__ == "__main__":

@@ -532,7 +532,7 @@
 
   /* ---------- Share the invitation: QR card image + message + link in one go ---------- */
   var shareUrl = C.shareUrl || location.href.split('#')[0];
-  // The link lives inside the text: apps such as WhatsApp drop `url` when an image is attached
+  // The link lives inside the text so it appears where the message says "Tap to open"
   var shareText = [
     '✨ You\'re Invited ✨',
     '',
@@ -553,42 +553,16 @@
   ].join('\n');
   var shareNote = $('#shareNote');
 
-  // Fetch the QR card ahead of time: awaiting it inside the click would expire the
-  // user gesture that navigator.share needs (Safari is strict about this).
-  var qrFile = null;
-  if(window.fetch && window.File){
-    fetch(C.shareImage || 'share/invite-qr.png')
-      .then(function(r){ return r.ok ? r.blob() : Promise.reject(); })
-      .then(function(b){ qrFile = new File([b], 'Arun-Priya-Invitation.png', {type:'image/png'}); })
-      .catch(function(){});
-  }
-
-  function downloadQr(){
-    if(!qrFile) return;
-    var url = URL.createObjectURL(qrFile);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = qrFile.name;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
-  }
-
+  // Text only, on purpose: attaching an image makes WhatsApp send two separate messages.
+  // The link's preview card (og:image, with the QR) shows up inside the same message instead.
   $('#shareBtn').addEventListener('click', function(){
-    var title = C.couple.short + ' — ' + C.event.title;
     if(navigator.share){
-      var withImage = {title: title, text: shareText, files: qrFile ? [qrFile] : []};
-      var data = qrFile && navigator.canShare && navigator.canShare(withImage) ? withImage : {title: title, text: shareText};
-      navigator.share(data).catch(function(){});
+      navigator.share({title: C.couple.short + ' — ' + C.event.title, text: shareText}).catch(function(){});
       return;
     }
-    // Desktop: copy the message (link included) and save the QR card for attaching
     var copied = navigator.clipboard ? navigator.clipboard.writeText(shareText) : Promise.reject();
-    copied.then(function(){
-      downloadQr();
-      shareNote.textContent = qrFile ? 'Message copied & QR card saved — paste the message and attach the card.' : 'Invitation message copied — paste it to share.';
-    }).catch(function(){ shareNote.textContent = shareUrl; });
+    copied.then(function(){ shareNote.textContent = 'Invitation message copied — paste it to share.'; })
+      .catch(function(){ shareNote.textContent = shareUrl; });
   });
 
   /* ---------- Background music (only when config.music names a file) ---------- */
