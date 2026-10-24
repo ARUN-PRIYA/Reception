@@ -101,7 +101,7 @@ def preview_card():
     card.paste(qr, (qx - qr.width // 2, ty + 12))
     centered(d, qx, ty + tile + 22, "SCAN TO OPEN", font("Cinzel.ttf", 18), GOLD, spacing=3)
 
-    card.save(os.path.join(IMAGES, "share-card.jpg"), "JPEG", quality=86, optimize=True, progressive=True)
+    card.save(os.path.join(IMAGES, "share-qr.jpg"), "JPEG", quality=86, optimize=True, progressive=True)
 
 
 def qr_image(scale, dark, light):
