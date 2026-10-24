@@ -140,7 +140,7 @@ we joyfully invite you and your family to our
 *Arun & Priya*
 
 \U0001F4C5 Wednesday, 11 November 2026
-\U0001F55B 6:00 PM onwards
+\0001F555 6:00 PM onwards
 \U0001F4CD Flora Park Inn, Coimbatore
 
 Tap to open our invitation \U0001F447
